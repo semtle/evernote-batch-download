@@ -1,0 +1,8 @@
+#!/usr/bin/expect -f
+
+spawn geeknote "notebook-list"
+
+expect "More"
+sleep 2
+send "j"
+interact
