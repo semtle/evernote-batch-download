@@ -1,0 +1,51 @@
+#!/bin/zsh
+
+pwd_usr=$(pwd)
+
+# Install expect if not available
+echo "Checking expect"
+if ! which expect; then
+	sudo apt-get install expect
+fi
+
+# Install python3 if not available
+echo "Checking python"
+if ! which python3; then
+	sudo apt-get install python3
+fi
+
+# Log in user
+echo "Logging in"
+geeknote login
+
+# Go to install directory
+echo "Make directory, and get in"
+home="$HOME/evernote"
+if [ ! -d $home ]; then
+	mkdir $home
+fi
+cd $home
+
+# Run the expect script
+echo "Running expect"
+$pwd_usr/geeknote-expect > notebooks-dirty.txt 2>&1
+
+# Run the python script
+echo "Making notebooks.txt and running python"
+touch notebooks.txt
+python3 $pwd_usr/clean-file.py
+
+# Doing the dirty work
+# Read the file
+echo "It's all in the loop baby."
+while IFS='' read -r line || [[ -n "$line" ]]; do
+	safe_line=$(python3 $pwd_usr/directorize.py $line)
+	mkdir $safe_line
+	echo "Making $line dir, then syncing."
+	gnsync --path $home/$line --notebook $line --two-way TWO_WAY
+done < notebooks.txt
+
+# Remove intermediary files
+rm notebooks-dirty.txt notebooks.txt
+
+echo "I have downloaded all your notes and notebooks. Enjoy."
