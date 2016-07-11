@@ -5,13 +5,13 @@ pwd_usr=$(pwd)
 # Install expect if not available
 echo "Checking expect"
 if ! which expect; then
-	sudo apt-get install expect
+    sudo apt-get install expect
 fi
 
 # Install python3 if not available
 echo "Checking python"
 if ! which python3; then
-	sudo apt-get install python3
+    sudo apt-get install python3
 fi
 
 # Log in user
@@ -22,7 +22,7 @@ geeknote login
 echo "Make directory, and get in"
 home="$HOME/evernote"
 if [ ! -d $home ]; then
-	mkdir $home
+    mkdir $home
 fi
 cd $home
 
@@ -39,10 +39,10 @@ python3 $pwd_usr/clean-file.py
 # Read the file
 echo "It's all in the loop baby."
 while IFS='' read -r line || [[ -n "$line" ]]; do
-	safe_line=$(python3 $pwd_usr/directorize.py $line)
-	mkdir $safe_line
-	echo "Making $line dir, then syncing."
-	gnsync --path $home/$line --notebook $line --two-way TWO_WAY
+    safe_line=$(python3 $pwd_usr/directorize.py $line)
+    mkdir $safe_line
+    echo "Making $line dir, then syncing."
+    gnsync --path $home/$line --notebook $line --two-way TWO_WAY
 done < notebooks.txt
 
 # Remove intermediary files
